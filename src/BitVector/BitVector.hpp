@@ -10,7 +10,7 @@ namespace bv {
 
 
 	template <std::integral IntType>
-	std::string toHex(IntType chunk);
+	std::string toHex(IntType bits);
 
 	template <std::integral IntType>
 	IntType logLeftShift(IntType bits, uint8_t count);
@@ -32,31 +32,31 @@ namespace bv {
 	class BitVector {
 
 	private:
-		IntType *chunks_;
-		size_t size_;  // bit
-		uint64_t chunk_count_;
-		uint8_t chunk_size_;  // byte
+		IntType *bits_;
+		size_t size_;  // Размер вектора в битах
+		uint64_t chunk_count_;  // Количество переменных типа IntType в массиве bits_
+		uint8_t chunk_size_;  // Размер типа IntType в битах
 
 	public:
 		BitVector();
 		
 		BitVector(size_t size);
 		
-		BitVector(size_t size, IntType *bits);
+		BitVector(size_t size, const IntType *bits);
 		
-		BitVector(size_t size, IntType *bits, size_t tmplt_size);
+		BitVector(size_t size, const IntType *bits, size_t tmplt_size);
 		
 		~BitVector();
 		
 		size_t getSize() const;
 		
-		void setBits(size_t size, IntType *bits, size_t offset);
+		void setBits(size_t field_size, const IntType *bits, uint64_t offset);
 		
-		void setBits(BitVector<IntType> &bitVector, size_t offset);
+		void setBits(const BitVector<IntType> &bit_vector, uint64_t offset);
 		
-		IntType *getBits(size_t size, size_t offset);
+		IntType *getBits(size_t field_size, uint64_t offset) const;
 		
-		IntType getFewBits(size_t size, size_t offset);
+		IntType getFewBits(size_t field_size, uint64_t offset) const;
 		
 		std::string toString() const;
 		
