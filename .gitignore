@@ -1,3 +1,11 @@
+# My addition
+/*
+!/*.*
+!/src
+!/tests
+/*.cmake*
+/CMakeCache.txt
+
 # Prerequisites
 *.d
 
