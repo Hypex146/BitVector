@@ -585,7 +585,7 @@ TEST(GETFEWBITS, INT8_T) {
 		//std::cout << "DATA: " << max_size << " " << size << " " << offset << std::endl;
 		BitVector<int8_t> v1 = BitVector<int8_t>(max_size, bits);
 		BitVector<int8_t> v2 = BitVector<int8_t>(max_size, bits);
-		int8_t tmp_1 = v1.getFewBits(size, offset);
+		int8_t tmp_1 = v1.getFewBits<int8_t>(size, offset);
 		int8_t tmp_2[1] = {tmp_1};
 		v2.setBits(size, tmp_2, offset);
 		EXPECT_STREQ(v1.toString().c_str(), v2.toString().c_str());
@@ -593,9 +593,9 @@ TEST(GETFEWBITS, INT8_T) {
 		//std::cout << "V2: " << v2.toString() << std::endl;
 	}
 	BitVector<int8_t> v1 = BitVector<int8_t>(1, bits);
-	EXPECT_THROW(v1.getBits(1, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(10, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(1, 10), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int8_t>(1, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int8_t>(10, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int8_t>(1, 10), std::out_of_range);
 }
 
 
@@ -610,7 +610,7 @@ TEST(GETFEWBITS, UINT8_T) {
 		//std::cout << "DATA: " << max_size << " " << size << " " << offset << std::endl;
 		BitVector<uint8_t> v1 = BitVector<uint8_t>(max_size, bits);
 		BitVector<uint8_t> v2 = BitVector<uint8_t>(max_size, bits);
-		uint8_t tmp_1 = v1.getFewBits(size, offset);
+		uint8_t tmp_1 = v1.getFewBits<uint8_t>(size, offset);
 		uint8_t tmp_2[1] = {tmp_1};
 		v2.setBits(size, tmp_2, offset);
 		EXPECT_STREQ(v1.toString().c_str(), v2.toString().c_str());
@@ -618,9 +618,9 @@ TEST(GETFEWBITS, UINT8_T) {
 		//std::cout << "V2: " << v2.toString() << std::endl;
 	}
 	BitVector<uint8_t> v1 = BitVector<uint8_t>(1, bits);
-	EXPECT_THROW(v1.getBits(1, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(10, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(1, 10), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<uint8_t>(1, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<uint8_t>(10, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<uint8_t>(1, 10), std::out_of_range);
 }
 
 
@@ -635,7 +635,7 @@ TEST(GETFEWBITS, INT64_T) {
 		//std::cout << "DATA: " << max_size << " " << size << " " << offset << std::endl;
 		BitVector<int64_t> v1 = BitVector<int64_t>(max_size, bits);
 		BitVector<int64_t> v2 = BitVector<int64_t>(max_size, bits);
-		int64_t tmp_1 = v1.getFewBits(size, offset);
+		int64_t tmp_1 = v1.getFewBits<int64_t>(size, offset);
 		int64_t tmp_2[1] = {tmp_1};
 		v2.setBits(size, tmp_2, offset);
 		EXPECT_STREQ(v1.toString().c_str(), v2.toString().c_str());
@@ -643,9 +643,9 @@ TEST(GETFEWBITS, INT64_T) {
 		//std::cout << "V2: " << v2.toString() << std::endl;
 	}
 	BitVector<int64_t> v1 = BitVector<int64_t>(1, bits);
-	EXPECT_THROW(v1.getBits(1, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(10, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(1, 10), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int64_t>(1, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int64_t>(10, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int64_t>(1, 10), std::out_of_range);
 }
 
 
@@ -660,7 +660,7 @@ TEST(GETFEWBITS, UINT64_T) {
 		//std::cout << "DATA: " << max_size << " " << size << " " << offset << std::endl;
 		BitVector<uint64_t> v1 = BitVector<uint64_t>(max_size, bits);
 		BitVector<uint64_t> v2 = BitVector<uint64_t>(max_size, bits);
-		uint64_t tmp_1 = v1.getFewBits(size, offset);
+		uint64_t tmp_1 = v1.getFewBits<uint64_t>(size, offset);
 		uint64_t tmp_2[1] = {tmp_1};
 		v2.setBits(size, tmp_2, offset);
 		EXPECT_STREQ(v1.toString().c_str(), v2.toString().c_str());
@@ -668,7 +668,61 @@ TEST(GETFEWBITS, UINT64_T) {
 		//std::cout << "V2: " << v2.toString() << std::endl;
 	}
 	BitVector<uint64_t> v1 = BitVector<uint64_t>(1, bits);
-	EXPECT_THROW(v1.getBits(1, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(10, 1), std::out_of_range);
-	EXPECT_THROW(v1.getBits(1, 10), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<uint64_t>(1, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<uint64_t>(10, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<uint64_t>(1, 10), std::out_of_range);
+}
+
+
+TEST(GETFEWBITS, INT8_T_INT64_T) {
+	srand(time(NULL));
+	int8_t bits[] = {-1, 127, -128, -1, 15, -61, -17, 9};
+	int iter_c = 1000;
+	for (int i = 0; i < iter_c; i++) {
+		size_t max_size = (std::rand() % (8 * sizeof(int8_t) * BITS_IN_BYTE)) + 1;
+		size_t size = (std::rand() % (sizeof(int8_t) * BITS_IN_BYTE + 1)) % (max_size + 1);
+		size_t offset = std::rand() % (max_size - size + 1);
+		//std::cout << "DATA: " << max_size << " " << size << " " << offset << std::endl;
+		BitVector<int8_t> v1 = BitVector<int8_t>(max_size, bits);
+		BitVector<int8_t> v2 = BitVector<int8_t>(max_size, bits);
+		int8_t tmp_1 = v1.getFewBits<int64_t>(size, offset);
+		int8_t tmp_2[1] = {tmp_1};
+		v2.setBits(size, tmp_2, offset);
+		EXPECT_STREQ(v1.toString().c_str(), v2.toString().c_str());
+		//std::cout << "V1: " << v1.toString() << std::endl;
+		//std::cout << "V2: " << v2.toString() << std::endl;
+	}
+	int8_t bits_[] = {-1, -1, -1, -1, -1, -1, -1, -1};
+	BitVector<int8_t> v = BitVector<int8_t>(8 * sizeof(int8_t) * BITS_IN_BYTE, bits_);
+	int64_t tmp = v.getFewBits<int64_t>(sizeof(int64_t) * BITS_IN_BYTE, 0);
+	EXPECT_EQ(tmp, -1);
+	BitVector<int8_t> v1 = BitVector<int8_t>(1, bits);
+	EXPECT_THROW(v1.getFewBits<int64_t>(1, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int64_t>(10, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int64_t>(1, 10), std::out_of_range);
+}
+
+
+TEST(GETFEWBITS, INT64_T_INT8_T) {
+	srand(time(NULL));
+	int64_t bits[] = {-1, 127, -128, -1, 15, -61, -17, 9};
+	int iter_c = 1000;
+	for (int i = 0; i < iter_c; i++) {
+		size_t max_size = (std::rand() % (8 * sizeof(int64_t) * BITS_IN_BYTE)) + 1;
+		size_t size = (std::rand() % (sizeof(int8_t) * BITS_IN_BYTE + 1)) % (max_size + 1);
+		size_t offset = std::rand() % (max_size - size + 1);
+		//std::cout << "DATA: " << max_size << " " << size << " " << offset << std::endl;
+		BitVector<int64_t> v1 = BitVector<int64_t>(max_size, bits);
+		BitVector<int64_t> v2 = BitVector<int64_t>(max_size, bits);
+		int64_t tmp_1 = v1.getFewBits<int8_t>(size, offset);
+		int64_t tmp_2[1] = {tmp_1};
+		v2.setBits(size, tmp_2, offset);
+		EXPECT_STREQ(v1.toString().c_str(), v2.toString().c_str());
+		//std::cout << "V1: " << v1.toString() << std::endl;
+		//std::cout << "V2: " << v2.toString() << std::endl;
+	}
+	BitVector<int64_t> v1 = BitVector<int64_t>(1, bits);
+	EXPECT_THROW(v1.getFewBits<int8_t>(1, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int8_t>(10, 1), std::out_of_range);
+	EXPECT_THROW(v1.getFewBits<int8_t>(1, 10), std::out_of_range);
 }

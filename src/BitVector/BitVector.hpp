@@ -56,7 +56,8 @@ namespace bv {
 		
 		IntType *getBits(size_t field_size, uint64_t offset) const;
 		
-		IntType getFewBits(size_t field_size, uint64_t offset) const;
+		template<std::integral RetIntType>
+		RetIntType getFewBits(size_t field_size, uint64_t offset) const;
 		
 		std::string toString() const;
 		

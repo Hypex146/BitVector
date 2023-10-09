@@ -185,17 +185,19 @@ IntType *bv::BitVector<IntType>::getBits(size_t field_size, uint64_t offset) con
 
 
 template<std::integral IntType>
-IntType bv::BitVector<IntType>::getFewBits(size_t field_size, uint64_t offset) const {
-	if ((field_size + offset > size_) || (field_size > chunk_size_)) {
+template<std::integral RetIntType>
+RetIntType bv::BitVector<IntType>::getFewBits(size_t field_size, uint64_t offset) const {
+	uint8_t ret_chunk_size = sizeof(RetIntType) * BITS_IN_BYTE;
+	if ((field_size + offset > size_) || (field_size > ret_chunk_size)) {
 		throw std::out_of_range("Going beyond the border of bit vector");
 	}
-	IntType res;
+	RetIntType res;
 	uint64_t base_bit_index = offset;
 	uint8_t ret_bit_index = 0;
 	for (int i = 0; i < field_size; i++) {
 		uint64_t base_chunk_index = base_bit_index / (chunk_size_);
 		uint8_t base_chunk_bit_index = base_bit_index % (chunk_size_);
-		res = setBit<IntType>(res, ret_bit_index, getBit<IntType>(bits_[base_chunk_index], base_chunk_bit_index));
+		res = setBit<RetIntType>(res, ret_bit_index, getBit<IntType>(bits_[base_chunk_index], base_chunk_bit_index));
 		base_bit_index++;
 		ret_bit_index++;
 	}
