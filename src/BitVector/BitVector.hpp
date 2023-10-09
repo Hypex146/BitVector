@@ -67,4 +67,4 @@ namespace bv {
 }
 
 
-#include "Bitvector.tpp"
+#include "BitVector.tpp"
