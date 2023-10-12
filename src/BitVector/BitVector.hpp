@@ -42,7 +42,7 @@ namespace bv {
 		
 		BitVector(size_t size);  // HCT
 		
-		BitVector(size_t size, const IntType *tmplt_bits);  // HCT
+		BitVector(size_t size, const IntType *tmplt_bits);  // HCTE
 		
 		BitVector(const BitVector<IntType> &bit_vector);  // HCT
 		
@@ -54,22 +54,22 @@ namespace bv {
 		
 		~BitVector();  // HCT
 		
-		size_t getSize() const;  // HC
+		size_t getSize() const;  // HCE
 		
-		void setBit(uint64_t position, bool bit);  // HCT
+		void setBit(uint64_t position, bool bit);  // HCTE
 		
-		bool getBit(uint64_t position) const;  // HCT
+		bool getBit(uint64_t position) const;  // HCTE
 		
 		void setBits(size_t field_size, const IntType *bits, uint64_t offset);  // HCT
 		
-		void setBits(const BitVector<IntType> &bit_vector, uint64_t offset);  // HCT
+		void setBits(const BitVector<IntType> &bit_vector, uint64_t offset);  // HCTE
 		
-		BitVector<IntType> getBits(size_t field_size, uint64_t offset) const;  // HCT
+		BitVector<IntType> getBits(size_t field_size, uint64_t offset) const;  // HCTE
 		
 		template<std::integral RetIntType>
-		RetIntType getFewBits(uint8_t field_size, uint64_t offset) const;  // HCT
+		RetIntType getFewBits(uint8_t field_size, uint64_t offset) const;  // HCTE
 		
-		std::string toString() const;  // HCT
+		std::string toString() const;  // HCTЕ
 		
 	};
 
