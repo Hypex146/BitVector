@@ -36,10 +36,10 @@ int main(int argc, char *argv[]) {
 	std::cout << "5. Бит на позиции 17 bv_1: " << bv_1.getBit(17) << std::endl;  // получить бит
 	// bv_1: 11(0)0.1110.1101.0001.1011 -> 0
 	
-	uint8_t tmplt_1[] = {155, 39};
+	uint8_t tmplt_1[] = {155, 39};  // шаблон для создания бит-вектора
 	// tmplt_1 = {10011011, 00100111}
 	
-	BitVector<uint8_t> bv_2{sizeof(uint8_t) * 2 * BITS_IN_BYTE - 2, tmplt_1};
+	BitVector<uint8_t> bv_2{sizeof(uint8_t) * 2 * BITS_IN_BYTE - 2, tmplt_1};  // конструктор
 	// bv_2 = 01.1011.0010.0111 - полученный бит-вектор (точки для удобства)
 	// Старшие 2 бита числа 155 были отброшены, ибо не поместились в вектор
 	
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "7. Вектор bv_2: " << bv_2.toString() << std::endl;  // получить строку
 	// bv_2 = 01.1011.0010.0111 = 1b27
 	
-	bv_1.setBits(bv_2, 5);
+	bv_1.setBits(bv_2, 5);  // установить бит-поле
 	// bv_1 = 11000110110100111011
 	// bv_2 =  01101100100111      <- смещение 5 бит
 	// bv_1 = 10110110010011111011 = 1011.0110.0100.1111.1011
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "8. Вектор bv_1: " << bv_1.toString() << std::endl;  // получить строку
 	// bv_1 = 1011.0110.0100.1111.1011 = b64fb
 	
-	BitVector<uint8_t> bv_3 = bv_1.getBits(sizeof(uint8_t) * BITS_IN_BYTE + 1, 6);
+	BitVector<uint8_t> bv_3 = bv_1.getBits(sizeof(uint8_t) * BITS_IN_BYTE + 1, 6);  // получить бит-поле
 	// bv_1 = 10110110010011111011
 	// bv_3 =      110010011       <- смещение 6 и разрядность 9
 	
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "10. Вектор bv_3: " << bv_3.toString() << std::endl;  // получить строку
 	// bv_3 = 1.1001.0011 = 193
 	
-	uint16_t a = bv_1.getFewBits<uint16_t>(sizeof(uint16_t) * BITS_IN_BYTE - 1, 1);
+	uint16_t a = bv_1.getFewBits<uint16_t>(sizeof(uint16_t) * BITS_IN_BYTE - 1, 1);  // получить бит-поле в переменную
 	// bv_1 = 10110110010011111011
 	// a =        011001001111101 <- смещение 1 и разрядность 15
 	

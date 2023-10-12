@@ -222,6 +222,9 @@ bv::BitVector<IntType> bv::BitVector<IntType>::getBits(size_t field_size, uint64
 	if (field_size + offset > size_) {
 		throw std::out_of_range("Going beyond the border of bit vector");
 	}
+	if (field_size == 0) {
+		throw std::invalid_argument("Invalid field size value");
+	}
 	BitVector<IntType> bit_vector = BitVector<IntType>(field_size);
 	for (int i = 0; i < field_size; i++) {
 		bit_vector.setBit(i, getBit(offset + i));

@@ -6,6 +6,7 @@
 #include "gt.BitVector.operators.hpp"
 #include "gt.BitVector.setNgetBit.hpp"
 #include "gt.BitVector.setNgetBits.hpp"
+#include "gt.BitVector.other.hpp"
 
 
 int main(int argc, char **argv) {

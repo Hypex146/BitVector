@@ -16,6 +16,7 @@ TEST(SETBIT, INT8) {
 	EXPECT_STREQ(bv1.toString().c_str(), "ff05");
 	bv1.setBit(sizeof(int8_t) * BITS_IN_BYTE * 2 - 1, 0);
 	EXPECT_STREQ(bv1.toString().c_str(), "7f05");
+	EXPECT_THROW(bv1.setBit(sizeof(int8_t) * BITS_IN_BYTE * 2, 0), std::out_of_range);
 }
 
 
@@ -28,6 +29,7 @@ TEST(SETBIT, INT64) {
 	EXPECT_STREQ(bv1.toString().c_str(), "ffffffffffffffff0000000000000005");
 	bv1.setBit(sizeof(int64_t) * BITS_IN_BYTE * 2 - 1, 0);
 	EXPECT_STREQ(bv1.toString().c_str(), "7fffffffffffffff0000000000000005");
+	EXPECT_THROW(bv1.setBit(sizeof(int64_t) * BITS_IN_BYTE * 2, 0), std::out_of_range);
 }
 
 
@@ -38,6 +40,7 @@ TEST(GETBIT, INT8) {
 	EXPECT_EQ(bv1.getBit(1), 0);
 	EXPECT_EQ(bv1.getBit(2), 1);
 	EXPECT_EQ(bv1.getBit(sizeof(int8_t) * BITS_IN_BYTE * 2 - 1), 1);
+	EXPECT_THROW(bv1.getBit(sizeof(int8_t) * BITS_IN_BYTE * 2), std::out_of_range);
 }
 
 
@@ -48,4 +51,5 @@ TEST(GETBIT, INT64) {
 	EXPECT_EQ(bv1.getBit(1), 0);
 	EXPECT_EQ(bv1.getBit(2), 1);
 	EXPECT_EQ(bv1.getBit(sizeof(int64_t) * BITS_IN_BYTE * 2 - 1), 1);
+	EXPECT_THROW(bv1.getBit(sizeof(int64_t) * BITS_IN_BYTE * 2), std::out_of_range);
 }

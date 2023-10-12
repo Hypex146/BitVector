@@ -27,6 +27,9 @@ TEST(SETBITS_0, INT8) {
 	EXPECT_STREQ(bv1.toString().c_str(), "1008");
 	bv1.setBits(sizeof(int8_t) * BITS_IN_BYTE * 1 + 2, bits4, 0);
 	EXPECT_STREQ(bv1.toString().c_str(), "1305");
+	EXPECT_THROW(bv1.setBits(sizeof(int8_t) * BITS_IN_BYTE * 2, bits4, 1), std::out_of_range);
+	EXPECT_THROW(bv1.setBits(1, bits4, sizeof(int8_t) * BITS_IN_BYTE * 2), std::out_of_range);
+	EXPECT_THROW(bv1.setBits(0, bits4, 1), std::invalid_argument);
 }
 
 
@@ -50,6 +53,9 @@ TEST(SETBITS_0, INT64) {
 	EXPECT_STREQ(bv1.toString().c_str(), "00000000000000100000000000000008");
 	bv1.setBits(sizeof(int64_t) * BITS_IN_BYTE * 1 + 2, bits4, 0);
 	EXPECT_STREQ(bv1.toString().c_str(), "00000000000000130000000000000005");
+	EXPECT_THROW(bv1.setBits(sizeof(int64_t) * BITS_IN_BYTE * 2, bits4, 1), std::out_of_range);
+	EXPECT_THROW(bv1.setBits(1, bits4, sizeof(int64_t) * BITS_IN_BYTE * 2), std::out_of_range);
+	EXPECT_THROW(bv1.setBits(0, bits4, 1), std::invalid_argument);
 }
 
 
@@ -66,6 +72,7 @@ TEST(SETBITS_1, INT8) {
 	EXPECT_STREQ(bv1.toString().c_str(), "0fff");
 	bv1.setBits(bv2, 5);
 	EXPECT_STREQ(bv1.toString().c_str(), "1fff");
+	EXPECT_THROW(bv1.setBits(bv2, sizeof(int8_t) * BITS_IN_BYTE + 1), std::out_of_range);
 }
 
 
@@ -82,6 +89,7 @@ TEST(SETBITS_1, INT64) {
 	EXPECT_STREQ(bv1.toString().c_str(), "000000000000000fffffffffffffffff");
 	bv1.setBits(bv2, 5);
 	EXPECT_STREQ(bv1.toString().c_str(), "000000000000001fffffffffffffffff");
+	EXPECT_THROW(bv1.setBits(bv2, sizeof(int64_t) * BITS_IN_BYTE + 1), std::out_of_range);
 }
 
 
@@ -107,6 +115,9 @@ TEST(GETBITS, INT8) {
 	EXPECT_STREQ(bv2.toString().c_str(), "b8");
 	bv2 = bv1.getBits(sizeof(int8_t) * BITS_IN_BYTE * 2, 0);
 	EXPECT_STREQ(bv2.toString().c_str(), "570a");
+	EXPECT_THROW(bv1.getBits(sizeof(int8_t) * BITS_IN_BYTE * 2, 1), std::out_of_range);
+	EXPECT_THROW(bv1.getBits(1, sizeof(int8_t) * BITS_IN_BYTE * 2), std::out_of_range);
+	EXPECT_THROW(bv1.getBits(0, 1), std::invalid_argument);
 }
 
 
@@ -132,10 +143,13 @@ TEST(GETBITS, INT64) {
 	EXPECT_STREQ(bv2.toString().c_str(), "0000002b80000000");
 	bv2 = bv1.getBits(sizeof(int64_t) * BITS_IN_BYTE * 2, 0);
 	EXPECT_STREQ(bv2.toString().c_str(), "0000000000000057000000000000000a");
+	EXPECT_THROW(bv1.getBits(sizeof(int64_t) * BITS_IN_BYTE * 2, 1), std::out_of_range);
+	EXPECT_THROW(bv1.getBits(1, sizeof(int64_t) * BITS_IN_BYTE * 2), std::out_of_range);
+	EXPECT_THROW(bv1.getBits(0, 1), std::invalid_argument);
 }
 
 
-TEST(GETBITS, INT8_INT8) {
+TEST(GETFEWBITS, INT8_INT8) {
 	int8_t bits[] = {87, 10};
 	BitVector<int8_t> bv1 = BitVector<int8_t>(sizeof(int8_t) * BITS_IN_BYTE * 2, bits);
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(1, 0)).c_str(), "00");
@@ -145,10 +159,13 @@ TEST(GETBITS, INT8_INT8) {
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE - 2, 2)).c_str(), "02");
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE, sizeof(int8_t) * BITS_IN_BYTE)).c_str(), "57");
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE - 1, sizeof(int8_t) * BITS_IN_BYTE + 1)).c_str(), "2b");
+	EXPECT_THROW(bv1.getFewBits<int8_t>(0, 1), std::invalid_argument);
+	EXPECT_THROW(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE * 2, 1), std::out_of_range);
+	EXPECT_THROW(bv1.getFewBits<int8_t>(1, sizeof(int8_t) * BITS_IN_BYTE * 2), std::out_of_range);
 }
 
 
-TEST(GETBITS, INT8_INT64) {
+TEST(GETFEWBITS, INT8_INT64) {
 	int8_t bits[] = {87, 10};
 	BitVector<int8_t> bv1 = BitVector<int8_t>(sizeof(int8_t) * BITS_IN_BYTE * 2, bits);
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(1, 0)).c_str(), "0000000000000000");
@@ -159,10 +176,13 @@ TEST(GETBITS, INT8_INT64) {
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(sizeof(int8_t) * BITS_IN_BYTE, sizeof(int8_t) * BITS_IN_BYTE)).c_str(), "0000000000000057");
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(sizeof(int8_t) * BITS_IN_BYTE - 1, sizeof(int8_t) * BITS_IN_BYTE + 1)).c_str(), "000000000000002b");
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(sizeof(int8_t) * BITS_IN_BYTE * 2, 0)).c_str(), "000000000000570a");
+	EXPECT_THROW(bv1.getFewBits<int64_t>(0, 1), std::invalid_argument);
+	EXPECT_THROW(bv1.getFewBits<int64_t>(sizeof(int8_t) * BITS_IN_BYTE * 2, 1), std::out_of_range);
+	EXPECT_THROW(bv1.getFewBits<int64_t>(1, sizeof(int8_t) * BITS_IN_BYTE * 2), std::out_of_range);
 }
 
 
-TEST(GETBITS, INT64_INT64) {
+TEST(GETFEWBITS, INT64_INT64) {
 	int64_t bits[] = {87, 10};
 	BitVector<int64_t> bv1 = BitVector<int64_t>(sizeof(int64_t) * BITS_IN_BYTE * 2, bits);
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(1, 0)).c_str(), "0000000000000000");
@@ -172,10 +192,13 @@ TEST(GETBITS, INT64_INT64) {
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(sizeof(int64_t) * BITS_IN_BYTE - 2, 2)).c_str(), "0000000000000002");
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(sizeof(int64_t) * BITS_IN_BYTE, sizeof(int64_t) * BITS_IN_BYTE)).c_str(), "0000000000000057");
 	EXPECT_STREQ(toHex<int64_t>(bv1.getFewBits<int64_t>(sizeof(int64_t) * BITS_IN_BYTE - 1, sizeof(int64_t) * BITS_IN_BYTE + 1)).c_str(), "000000000000002b");
+	EXPECT_THROW(bv1.getFewBits<int64_t>(0, 1), std::invalid_argument);
+	EXPECT_THROW(bv1.getFewBits<int64_t>(sizeof(int64_t) * BITS_IN_BYTE * 2, 1), std::out_of_range);
+	EXPECT_THROW(bv1.getFewBits<int64_t>(1, sizeof(int64_t) * BITS_IN_BYTE * 2), std::out_of_range);
 }
 
 
-TEST(GETBITS, INT64_INT8) {
+TEST(GETFEWBITS, INT64_INT8) {
 	int64_t bits[] = {87, 10};
 	BitVector<int64_t> bv1 = BitVector<int64_t>(sizeof(int64_t) * BITS_IN_BYTE * 2, bits);
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(1, 0)).c_str(), "00");
@@ -185,5 +208,8 @@ TEST(GETBITS, INT64_INT8) {
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE - 2, 2)).c_str(), "02");
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE, sizeof(int64_t) * BITS_IN_BYTE)).c_str(), "57");
 	EXPECT_STREQ(toHex<int8_t>(bv1.getFewBits<int8_t>(sizeof(int8_t) * BITS_IN_BYTE - 1, sizeof(int64_t) * BITS_IN_BYTE + 1)).c_str(), "2b");
+	EXPECT_THROW(bv1.getFewBits<int8_t>(0, 1), std::invalid_argument);
+	EXPECT_THROW(bv1.getFewBits<int8_t>(sizeof(int64_t) * BITS_IN_BYTE * 2, 1), std::out_of_range);
+	EXPECT_THROW(bv1.getFewBits<int8_t>(1, sizeof(int64_t) * BITS_IN_BYTE * 2), std::out_of_range);
 }
 	

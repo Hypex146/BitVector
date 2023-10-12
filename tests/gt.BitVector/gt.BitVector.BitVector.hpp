@@ -40,6 +40,7 @@ TEST(BITVECTOR_1, INT8) {
 	EXPECT_STREQ(bv6.toString().c_str(), "00");
 	BitVector<int8_t> bv7 = BitVector<int8_t>(sizeof(int8_t) * BITS_IN_BYTE);
 	EXPECT_STREQ(bv7.toString().c_str(), "00");
+	EXPECT_THROW(BitVector<int8_t>(0), std::invalid_argument);
 }
 
 
@@ -58,6 +59,7 @@ TEST(BITVECTOR_1, INT64) {
 	EXPECT_STREQ(bv6.toString().c_str(), "0000000000000000");
 	BitVector<int64_t> bv7 = BitVector<int64_t>(sizeof(int64_t) * BITS_IN_BYTE);
 	EXPECT_STREQ(bv7.toString().c_str(), "0000000000000000");
+	EXPECT_THROW(BitVector<int64_t>(0), std::invalid_argument);
 }
 
 
@@ -89,6 +91,7 @@ TEST(BITVECTOR_2, INT8) {
 	EXPECT_STREQ(bv12.toString().c_str(), "0a05ff03");
 	BitVector<int8_t> bv13 = BitVector<int8_t>(sizeof(int8_t) * BITS_IN_BYTE * 4, bits);
 	EXPECT_STREQ(bv13.toString().c_str(), "0a05ff03");
+	EXPECT_THROW(BitVector<int8_t>(0, bits), std::invalid_argument);
 }
 
 
@@ -120,6 +123,7 @@ TEST(BITVECTOR_2, INT64) {
 	EXPECT_STREQ(bv12.toString().c_str(), "000000000000000a0000000000000005ffffffffffffffff0000000000000003");
 	BitVector<int64_t> bv13 = BitVector<int64_t>(sizeof(int64_t) * BITS_IN_BYTE * 4, bits);
 	EXPECT_STREQ(bv13.toString().c_str(), "000000000000000a0000000000000005ffffffffffffffff0000000000000003");
+	EXPECT_THROW(BitVector<int64_t>(0, bits), std::invalid_argument);
 }
 
 
