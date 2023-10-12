@@ -1,30 +1,62 @@
-#include <iostream>
-#include <cmath>
-#include <iomanip>
-#include <algorithm>
 
 
 template <std::integral IntType>
-IntType bv::logLeftShift(IntType bits, uint8_t count) {
+IntType bv::logLeftShift(IntType bits, uint8_t offset) {
 	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
-	if (count >= type_size) {
+	if (offset >= type_size) {
 		return 0;
 	}
-	return bits << count;
+	return bits << offset;
 }
 
 
 template <std::integral IntType>
-IntType bv::logRightShift(IntType bits, uint8_t count) {
+IntType bv::logRightShift(IntType bits, uint8_t offset) {
 	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
-	if (count >= type_size) {
+	if (offset >= type_size) {
 		return 0;
 	}
-	if  (count == 0) {
+	if  (offset == 0) {
 		return bits;
 	}
-	IntType new_bits = setBit(bits >> 1, type_size - 1, 0);
-	return new_bits >> (count - 1);
+	bits = setBit<IntType>(bits >> 1, type_size - 1, 0);
+	return bits >> (offset - 1);
+}
+
+
+template <std::integral IntType>
+bool bv::getBit(IntType bits, uint8_t position) {
+	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
+	if (position >= type_size) {
+		throw std::out_of_range("The bit being get is outside of the allowed bits");
+	}
+	return logRightShift<IntType>(bits, position) & 1;
+}
+
+
+template <std::integral IntType>
+IntType bv::setBit(IntType bits, uint8_t position, bool bit) {
+	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
+	if (position >= type_size) {
+		throw std::out_of_range("The bit being set is outside of the allowed bits");
+	}
+	if (bit) {
+		bits |= logLeftShift<IntType>(1, position);
+	} else {
+		bits &= ~logLeftShift<IntType>(1, position);
+	}
+	return bits;
+}
+
+
+template <std::integral IntType>
+IntType bv::getMask(uint8_t size, uint8_t offset) {
+	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
+	if ((size + offset) > type_size) {
+		throw std::out_of_range("Going beyond the border of mask");
+	}
+	IntType mask = ~logLeftShift<IntType>(-1, size);
+	return logLeftShift<IntType>(mask, offset);
 }
 
 
@@ -41,46 +73,7 @@ std::string bv::toHex(IntType bits) {
 
 
 template <std::integral IntType>
-bool bv::getBit(IntType bits, uint8_t offset) {
-	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
-	if (offset >= type_size) {
-		throw std::out_of_range("The bit being set is outside of the allowed bits");
-	}
-	bool bit = logRightShift<IntType>(bits, offset) & 1;
-	return bit;
-}
-
-
-template <std::integral IntType>
-IntType bv::setBit(IntType bits, uint8_t offset, bool bit) {
-	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
-	if (offset >= type_size) {
-		throw std::out_of_range("The bit being set is outside of the allowed bits");
-	}
-	IntType new_bits = bits;
-	if (bit) {
-		new_bits |= logLeftShift<IntType>(1, offset);
-	} else {
-		new_bits &= ~logLeftShift<IntType>(1, offset);
-	}
-	return new_bits;
-}
-
-
-template <std::integral IntType>
-IntType bv::getMask(uint8_t size, uint8_t offset) {
-	uint8_t type_size = sizeof(IntType) * BITS_IN_BYTE;
-	if ((size + offset) > type_size) {
-		throw std::out_of_range("Going beyond the border of mask");
-	}
-	IntType mask = ~logLeftShift<IntType>(-1, size);
-	mask = logLeftShift<IntType>(mask, offset);
-	return mask;
-}
-
-
-template <std::integral IntType>
-bv::BitVector<IntType>::BitVector() : BitVector(sizeof(IntType) * bv::BITS_IN_BYTE, nullptr) {}
+bv::BitVector<IntType>::BitVector() : BitVector(sizeof(IntType) * BITS_IN_BYTE, nullptr) {}
 
 
 template <std::integral IntType>
@@ -88,41 +81,76 @@ bv::BitVector<IntType>::BitVector(size_t size) : BitVector(size, nullptr) {}
 
 
 template <std::integral IntType>
-bv::BitVector<IntType>::BitVector(size_t size, const IntType *bits) : BitVector(size, bits, size) {}
-
-
-template <std::integral IntType>
-bv::BitVector<IntType>::BitVector(size_t size, const IntType *bits, size_t tmplt_size) {
+bv::BitVector<IntType>::BitVector(size_t size, const IntType *tmplt_bits) {
 	if (size == 0) {
 		throw std::invalid_argument("Invalid vector size value");
-	}
-	if (tmplt_size == 0) {
-		throw std::invalid_argument("Invalid template vector size value");
-	}
-	if (size < tmplt_size) {
-		throw std::invalid_argument("Value \"tmplt_size\" should not be more than value \"size\"");
 	}
 	chunk_size_ = sizeof(IntType) * BITS_IN_BYTE;
 	size_ = size;
 	chunk_count_ = ceil((double) size_ / (double) (chunk_size_));
 	bits_ = new IntType[chunk_count_]{};
-	if (bits == nullptr) {
+	if (tmplt_bits == nullptr) {
 		return;
 	}
-	if (size_ <= tmplt_size) {
-		uint8_t remain_bits = size_ % (chunk_size_);
-		std::copy_n(bits, chunk_count_, bits_);
-		if (remain_bits > 0) {
-			bits_[chunk_count_ - 1] &= getMask<IntType>(remain_bits, 0);
-		}
-	} else {
-		uint64_t tmplt_chunk_count = ceil((double) tmplt_size / (double) (chunk_size_));
-		uint8_t tmplt_remain_bits = tmplt_size % (chunk_size_);
-		std::copy_n(bits, tmplt_chunk_count, bits_);
-		if (tmplt_remain_bits > 0) {
-			bits_[tmplt_chunk_count - 1] &= getMask<IntType>(tmplt_remain_bits, 0);
-		}
+	uint8_t remain_bits = size_ % (chunk_size_);
+	std::copy_n(tmplt_bits, chunk_count_, bits_);
+	if (remain_bits > 0) {
+		bits_[0] &= getMask<IntType>(remain_bits, 0);
 	}
+}
+
+
+template <std::integral IntType>
+bv::BitVector<IntType>::BitVector(const BitVector<IntType> &bit_vector) {
+	size_ = bit_vector.size_;
+	chunk_count_ = bit_vector.chunk_count_;
+	chunk_size_ = bit_vector.chunk_size_;
+	bits_ = new IntType[chunk_count_];
+	std::copy_n(bit_vector.bits_, chunk_count_, bits_);
+	//std::cout << "Copy constr" << std::endl;
+}
+
+
+template <std::integral IntType>
+bv::BitVector<IntType>::BitVector(BitVector<IntType> &&bit_vector) {
+	size_ = bit_vector.size_;
+	chunk_count_ = bit_vector.chunk_count_;
+	chunk_size_ = bit_vector.chunk_size_;
+	bits_ = bit_vector.bits_;
+	bit_vector.bits_ = nullptr;
+	//std::cout << "Move constr" << std::endl;
+}
+
+
+template <std::integral IntType>
+bv::BitVector<IntType> &bv::BitVector<IntType>::operator=(const BitVector<IntType> &bit_vector) {
+	//std::cout << "Copy op" << std::endl;
+	if (this == &bit_vector) {
+		return *this;
+	}
+	delete[] bits_;
+	size_ = bit_vector.size_;
+	chunk_count_ = bit_vector.chunk_count_;
+	chunk_size_ = bit_vector.chunk_size_;
+	bits_ = new IntType[chunk_count_];
+	std::copy_n(bit_vector.bits_, chunk_count_, bits_);
+	return *this;
+}
+
+
+template <std::integral IntType>
+bv::BitVector<IntType> &bv::BitVector<IntType>::operator=(BitVector<IntType> &&bit_vector) {
+	//std::cout << "Move op" << std::endl;
+	if (this == &bit_vector) {
+		return *this;
+	}
+	delete[] bits_;
+	size_ = bit_vector.size_;
+	chunk_count_ = bit_vector.chunk_count_;
+	chunk_size_ = bit_vector.chunk_size_;
+	bits_ = bit_vector.bits_;
+	bit_vector.bits_ = nullptr;
+	return *this;
 }
 
 
@@ -139,20 +167,42 @@ size_t bv::BitVector<IntType>::getSize() const {
 
 
 template <std::integral IntType>
+void bv::BitVector<IntType>::setBit(uint64_t position, bool bit) {
+	if (position >= size_) {
+		throw std::out_of_range("Going beyond the border of bit vector");
+	}
+	uint64_t chunk_index = chunk_count_ - (position / chunk_size_) - 1;
+	uint8_t bit_index = position % chunk_size_;
+	bits_[chunk_index] = bv::setBit<IntType>(bits_[chunk_index], bit_index, bit);
+}
+
+
+template <std::integral IntType>
+bool bv::BitVector<IntType>::getBit(uint64_t position) const {
+	if (position >= size_) {
+		throw std::out_of_range("Going beyond the border of bit vector");
+	}
+	uint64_t chunk_index = chunk_count_ - (position / chunk_size_) - 1;
+	uint8_t bit_index = position % chunk_size_;
+	return bv::getBit<IntType>(bits_[chunk_index], bit_index);
+}
+
+
+template <std::integral IntType>
 void bv::BitVector<IntType>::setBits(size_t field_size, const IntType *bits, uint64_t offset) {
 	if (field_size + offset > size_) {
 		throw std::out_of_range("Going beyond the border of bit vector");
 	}
-	uint64_t base_bit_index = offset;
-	uint64_t tmplt_bit_index = 0;
-	for (int i = 0; i < field_size; i++) {
-		uint64_t base_chunk_index = base_bit_index / (chunk_size_);
-		uint8_t base_chunk_bit_index = base_bit_index % (chunk_size_);
-		uint64_t tmplt_chunk_index = tmplt_bit_index / (chunk_size_);
-		uint8_t tmplt_chunk_bit_index = tmplt_bit_index % (chunk_size_);
-		bits_[base_chunk_index] = setBit<IntType>(bits_[base_chunk_index], base_chunk_bit_index, getBit<IntType>(bits[tmplt_chunk_index], tmplt_chunk_bit_index));
-		base_bit_index++;
-		tmplt_bit_index++;
+	if (field_size == 0) {
+		throw std::invalid_argument("Invalid field size value");
+	}
+	uint64_t base_bit_pos = offset;
+	uint64_t field_chunk_count = ceil((double) field_size / (double) (chunk_size_));
+	for (uint64_t field_bit_pos = 0; field_bit_pos < field_size; field_bit_pos++) {
+		uint64_t field_chunk_index = field_chunk_count - (field_bit_pos / chunk_size_) - 1;
+		uint8_t field_bit_index = field_bit_pos % chunk_size_;
+		setBit(base_bit_pos, bv::getBit<IntType>(bits[field_chunk_index], field_bit_index));
+		base_bit_pos++;
 	}
 }
 
@@ -164,44 +214,35 @@ void bv::BitVector<IntType>::setBits(const BitVector<IntType> &bit_vector, uint6
 
 
 template <std::integral IntType>
-IntType *bv::BitVector<IntType>::getBits(size_t field_size, uint64_t offset) const {
+bv::BitVector<IntType> bv::BitVector<IntType>::getBits(size_t field_size, uint64_t offset) const {
 	if (field_size + offset > size_) {
 		throw std::out_of_range("Going beyond the border of bit vector");
 	}
-	IntType *ret_bits = new IntType[(uint64_t) ceil((double) field_size / (double) (chunk_size_))]{};
-	uint64_t base_bit_index = offset;
-	uint64_t ret_bit_index = 0;
+	BitVector<IntType> bit_vector = BitVector<IntType>(field_size);
 	for (int i = 0; i < field_size; i++) {
-		uint64_t base_chunk_index = base_bit_index / (chunk_size_);
-		uint8_t base_chunk_bit_index = base_bit_index % (chunk_size_);
-		uint64_t ret_chunk_index = ret_bit_index / (chunk_size_);
-		uint8_t ret_chunk_bit_index = ret_bit_index % (chunk_size_);
-		ret_bits[ret_chunk_index] = setBit<IntType>(ret_bits[ret_chunk_index], ret_chunk_bit_index, getBit<IntType>(bits_[base_chunk_index], base_chunk_bit_index));
-		base_bit_index++;
-		ret_bit_index++;
+		bit_vector.setBit(i, getBit(offset + i));
 	}
-	return ret_bits;
+	return bit_vector;
 }
 
 
-template<std::integral IntType>
+template <std::integral IntType>
 template<std::integral RetIntType>
-RetIntType bv::BitVector<IntType>::getFewBits(size_t field_size, uint64_t offset) const {
-	uint8_t ret_chunk_size = sizeof(RetIntType) * BITS_IN_BYTE;
-	if ((field_size + offset > size_) || (field_size > ret_chunk_size)) {
+RetIntType bv::BitVector<IntType>::getFewBits(uint8_t field_size, uint64_t offset) const {
+	uint8_t type_size = sizeof(RetIntType) * BITS_IN_BYTE;
+	if (field_size + offset > size_ || field_size > type_size) {
 		throw std::out_of_range("Going beyond the border of bit vector");
 	}
-	RetIntType res;
-	uint64_t base_bit_index = offset;
-	uint8_t ret_bit_index = 0;
-	for (int i = 0; i < field_size; i++) {
-		uint64_t base_chunk_index = base_bit_index / (chunk_size_);
-		uint8_t base_chunk_bit_index = base_bit_index % (chunk_size_);
-		res = setBit<RetIntType>(res, ret_bit_index, getBit<IntType>(bits_[base_chunk_index], base_chunk_bit_index));
-		base_bit_index++;
-		ret_bit_index++;
+	if (field_size == 0) {
+		throw std::invalid_argument("Invalid field size value");
 	}
-	return res;
+	RetIntType bits = 0;
+	uint64_t base_bit_pos = offset;
+	for (uint64_t field_bit_pos = 0; field_bit_pos < field_size; field_bit_pos++) {
+		bits = bv::setBit<RetIntType>(bits, field_bit_pos, getBit(base_bit_pos));
+		base_bit_pos++;
+	}
+	return bits;
 }
 
 
@@ -210,22 +251,14 @@ std::string bv::BitVector<IntType>::toString() const {
 	std::stringstream str_stream;
 	uint8_t remain_bits = size_ % (chunk_size_);
 	uint8_t remain_dig = ceil((double) remain_bits / 4.0);
-	for (uint64_t i = 0; i < chunk_count_ - 1; i++) {
-		str_stream << toHex<IntType>(bits_[i]) << " ";
-	}
-	std::string hex_str = toHex<IntType>(bits_[chunk_count_ - 1]);
+	std::string hex_str = toHex<IntType>(bits_[0]);
 	if (remain_dig > 0) {
 		str_stream << hex_str.substr(hex_str.size() - remain_dig);
 	} else {
 		str_stream << hex_str;
 	}
+	for (uint64_t i = 1; i < chunk_count_; i++) {
+		str_stream << toHex<IntType>(bits_[i]);
+	}
 	return str_stream.str();
-}
-
-
-template <std::integral IntType> 
-void bv::BitVector<IntType>::print() const {
-	std::cout << "Vector size: " << size_ << " Chuck size: " << chunk_size_ 
-		<< " Chunk count: " << chunk_count_ << std::endl;
-	std::cout << toString() << std::endl;
 }
