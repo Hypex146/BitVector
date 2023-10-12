@@ -10,22 +10,22 @@ namespace bv {
 
 
 	template <std::integral IntType>
-	std::string toHex(IntType bits);
+	IntType logLeftShift(IntType bits, uint8_t offset);  // HCT
 
 	template <std::integral IntType>
-	IntType logLeftShift(IntType bits, uint8_t count);
-
-	template <std::integral IntType>
-	IntType logRightShift(IntType bits, uint8_t count);
+	IntType logRightShift(IntType bits, uint8_t offset);  // HCT
 	
 	template <std::integral IntType>
-	bool getBit(IntType bits, uint8_t offset);
+	bool getBit(IntType bits, uint8_t position);  // HCT
 	
 	template <std::integral IntType>
-	IntType setBit(IntType bits, uint8_t offset, bool bit);
+	IntType setBit(IntType bits, uint8_t position, bool bit);  // HCT
 	
 	template <std::integral IntType>
-	IntType getMask(uint8_t size, uint8_t offset);
+	IntType getMask(uint8_t size, uint8_t offset);  // HCT
+	
+	template <std::integral IntType>
+	std::string toHex(IntType bits);  // HCT
 
 
 	template <std::integral IntType>
@@ -38,30 +38,38 @@ namespace bv {
 		uint8_t chunk_size_;  // Размер типа IntType в битах
 
 	public:
-		BitVector();
+		BitVector();  // HCT
 		
-		BitVector(size_t size);
+		BitVector(size_t size);  // HCT
 		
-		BitVector(size_t size, const IntType *bits);
+		BitVector(size_t size, const IntType *tmplt_bits);  // HCTE
 		
-		BitVector(size_t size, const IntType *bits, size_t tmplt_size);
+		BitVector(const BitVector<IntType> &bit_vector);  // HCT
 		
-		~BitVector();
+		BitVector(BitVector<IntType> &&bit_vector);  // HCT
 		
-		size_t getSize() const;
+		BitVector<IntType> &operator=(const BitVector<IntType> &bit_vector);  // HCT
 		
-		void setBits(size_t field_size, const IntType *bits, uint64_t offset);
+		BitVector<IntType> &operator=(BitVector<IntType> &&bit_vector);  // HCT
 		
-		void setBits(const BitVector<IntType> &bit_vector, uint64_t offset);
+		~BitVector();  // HCT
 		
-		IntType *getBits(size_t field_size, uint64_t offset) const;
+		size_t getSize() const;  // HCE
+		
+		void setBit(uint64_t position, bool bit);  // HCTE
+		
+		bool getBit(uint64_t position) const;  // HCTE
+		
+		void setBits(size_t field_size, const IntType *bits, uint64_t offset);  // HCT
+		
+		void setBits(const BitVector<IntType> &bit_vector, uint64_t offset);  // HCTE
+		
+		BitVector<IntType> getBits(size_t field_size, uint64_t offset) const;  // HCTE
 		
 		template<std::integral RetIntType>
-		RetIntType getFewBits(size_t field_size, uint64_t offset) const;
+		RetIntType getFewBits(uint8_t field_size, uint64_t offset) const;  // HCTE
 		
-		std::string toString() const;
-		
-		void print() const;
+		std::string toString() const;  // HCTЕ
 		
 	};
 
